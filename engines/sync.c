@@ -107,6 +107,7 @@ static int fio_io_end(struct thread_data *td, struct io_u *io_u, int ret)
 	if (io_u->file && ret >= 0 && ddir_rw(io_u->ddir))
 		LAST_POS(io_u->file) = io_u->offset + ret;
 
+	rm_dprint_io_u(io_u, "ruiming");
 	if (ret != (int) io_u->xfer_buflen) {
 		if (ret >= 0) {
 			io_u->resid = io_u->xfer_buflen - ret;

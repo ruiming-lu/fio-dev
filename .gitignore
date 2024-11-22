@@ -1,3 +1,4 @@
+docker/fio-source.tar
 *.d
 *.o
 *.so

@@ -2424,6 +2424,10 @@ const struct debug_level debug_levels[] = {
 	  .help = "Zoned Block Device logging",
 	  .shift = FD_ZBD,
 	},
+	{ .name = "ruiming",
+	  .help = "RUIMING-specific logging",
+	  .shift = FD_RUIMING,
+	},
 	{ .name = NULL, },
 };
 

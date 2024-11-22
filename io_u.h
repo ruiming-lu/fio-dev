@@ -192,6 +192,23 @@ static inline void dprint_io_u(struct io_u *io_u, const char *p)
 #define dprint_io_u(io_u, p)
 #endif
 
+static inline void rm_dprint_io_u(struct io_u *io_u, const char *p)
+{
+	struct fio_file *f = io_u->file;
+
+	if (f)
+		dprint(FD_RUIMING, "%s: io_u %p: off=0x%llx,len=0x%llx,ddir=%d,file=%s\n",
+				p, io_u,
+				(unsigned long long) io_u->offset,
+				io_u->buflen, io_u->ddir,
+				f->file_name);
+	else
+		dprint(FD_RUIMING, "%s: io_u %p: off=0x%llx,len=0x%llx,ddir=%d\n",
+				p, io_u,
+				(unsigned long long) io_u->offset,
+				io_u->buflen, io_u->ddir);
+}
+
 static inline enum fio_ddir acct_ddir(struct io_u *io_u)
 {
 	if (io_u->acct_ddir != -1)
