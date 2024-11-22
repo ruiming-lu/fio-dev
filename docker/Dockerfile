@@ -7,6 +7,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
     curl \
     git \
     locales \
+    libaio-dev \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* \
