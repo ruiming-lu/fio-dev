@@ -309,12 +309,18 @@ int td_io_getevents(struct thread_data *td, unsigned int min, unsigned int max,
 	r = 0;
 	if (max && td->io_ops->getevents)
 		r = td->io_ops->getevents(td, min, max, t);
+	struct timespec curTime;
+	clock_gettime(CLOCK_REALTIME, &curTime);
+	dprint(FD_RUIMING, "in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);	
 out:
 	if (r >= 0) {
 		/*
 		 * Reflect that our submitted requests were retrieved with
 		 * whatever OS async calls are in the underlying engine.
 		 */
+		// struct timespec curTime;
+		// clock_gettime(CLOCK_REALTIME, &curTime);
+		// dprint(FD_RUIMING, "in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);
 		td->io_u_in_flight -= r;
 		io_u_mark_complete(td, r);
 	} else
