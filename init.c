@@ -1513,6 +1513,9 @@ static const char *make_log_name(const char *logname, const char *jobname)
 static int add_job(struct thread_data *td, const char *jobname, int job_add_num,
 		   int recursed, int client_type)
 {
+	// td->nr_completed = 0;
+	// td->nr_prepared = 0;
+	// td->nr_delta = 0;
 	unsigned int i;
 	char fname[PATH_MAX + 1];
 	int numjobs, file_alloced;

@@ -107,7 +107,19 @@ static int fio_io_end(struct thread_data *td, struct io_u *io_u, int ret)
 	if (io_u->file && ret >= 0 && ddir_rw(io_u->ddir))
 		LAST_POS(io_u->file) = io_u->offset + ret;
 
-	rm_dprint_io_u(io_u, "ruiming");
+	// rm_dprint_io_u(io_u, "ruiming");
+	// if (td->io_u_in_flight > 0) {
+	// 	dprint(FD_RUIMING, "%s: io_u %p: off=0x%llx,len=0x%llx,ddir=%d,in_flight=%u\n",
+	// 				"ruiming", io_u,
+	// 				(unsigned long long) io_u->offset,
+	// 				io_u->buflen, io_u->ddir,
+	// 				td->io_u_in_flight);
+	// }
+	// dprint(FD_RUIMING, "%s: io_u %p: off=0x%llx,len=0x%llx,ddir=%d,in_flight=%u\n",
+	// 		"ruiming", io_u,
+	// 		(unsigned long long) io_u->offset,
+	// 		io_u->buflen, io_u->ddir,
+	// 		td->io_u_in_flight);
 	if (ret != (int) io_u->xfer_buflen) {
 		if (ret >= 0) {
 			io_u->resid = io_u->xfer_buflen - ret;

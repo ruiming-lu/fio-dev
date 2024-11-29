@@ -263,7 +263,42 @@ void close_ioengine(struct thread_data *td)
 
 int td_io_prep(struct thread_data *td, struct io_u *io_u)
 {
+	/* 1. WONT WORK The code below tries to print the number of io_u in flight. #io_u_in_flight = iodepth
+	struct timespec curTime;
+	clock_gettime(CLOCK_REALTIME, &curTime);
+	if (td->io_u_in_flight) {
+		dprint(FD_RUIMING, "@@@td_io_prep: in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);
+	} else {
+		dprint(FD_RUIMING, "td_io_prep: io_u %p: off=0x%llx,len=0x%llx,ddir=%d,in_flight=%u, ts=%ld%ld\n",
+						io_u, (unsigned long long) io_u->offset, io_u->buflen, io_u->ddir, td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);	
+	}
+	// dprint(FD_RUIMING, "td_io_prep: io_u %p: off=0x%llx,len=0x%llx,ddir=%d,in_flight=%u, ts=%ld%ld\n",
+	// 					io_u, (unsigned long long) io_u->offset, io_u->buflen, io_u->ddir, td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);
+	*/
+
+	// 2. The following code tries to print disable_lat/clat/slat. Results: lat/clat/slat are ALL ENABLED
+	// dprint(FD_RUIMING, "disable_lat:%u, disable_clat:%u, disable_slat:%u\n", td->o.disable_lat, td->o.disable_clat, td->o.disable_slat);
+
+	// 3. WONT WORK. Calling slat/clat_log here results in ALWAYS NULL. 
+	// if (td->slat_log != NULL && td->clat_log != NULL)	
+		// dprint(FD_RUIMING, "test:%u\n", td->slat_log->log_type);
+		// if (td->slat_log->pending != NULL && td->clat_log->pending != NULL)	
+			// dprint(FD_RUIMING, "submitted:%llu, completed:%llu\n", td->slat_log->pending->nr_samples, td->clat_log->pending->nr_samples);
+
+	// 4. RUIMING: I add three more fields in thread_data in fio.h:
+	//		- nr_prepared: incremented upon ioengines.c:td_io_prep(...)
+	//		- nr_completed: incremented upon io_u.c:io_completed(...)
+	//		- nr_delta: changed upon ioengines.c:td_io_prep(...) and io_u.c:io_completed(...)
+	//		RESULTS: nr_delta always equal to (iodepth-1). We are playing with the io queue of FIO, not the underlying block devices.
+	// dprint(FD_RUIMING, "prepared:%d, completed:%d, delta:%d\n", td->nr_prepared, td->nr_completed, td->nr_delta);
+	// if (td->nr_delta < 31) 
+	// 	dprint(FD_RUIMING, "!!!!prepared:%d, completed:%d, delta:%d\n", td->nr_prepared, td->nr_completed, td->nr_delta);
+
+	// 5. RUIMING: reuse and invoke FIO's original counters for the numbers of submitted/completed IOs. Same problem as above 4.
+	// dprint(FD_RUIMING, "@@@ total_io_u:%llu, total_submit:%llu, total_complete:%llu, delta:%llu\n", td->ts.total_io_u,td->ts.total_submit, td->ts.total_complete, td->ts.total_complete-td->ts.total_submit);
 	dprint_io_u(io_u, "prep");
+	// td->nr_prepared++;
+	// td->nr_delta++;
 	fio_ro_check(td, io_u);
 
 	lock_file(td, io_u->file, io_u->ddir);
@@ -309,9 +344,9 @@ int td_io_getevents(struct thread_data *td, unsigned int min, unsigned int max,
 	r = 0;
 	if (max && td->io_ops->getevents)
 		r = td->io_ops->getevents(td, min, max, t);
-	struct timespec curTime;
-	clock_gettime(CLOCK_REALTIME, &curTime);
-	dprint(FD_RUIMING, "in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);	
+	// struct timespec curTime;
+	// clock_gettime(CLOCK_REALTIME, &curTime);
+	// dprint(FD_RUIMING, "td_io_getevents: in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);	
 out:
 	if (r >= 0) {
 		/*
@@ -320,7 +355,7 @@ out:
 		 */
 		// struct timespec curTime;
 		// clock_gettime(CLOCK_REALTIME, &curTime);
-		// dprint(FD_RUIMING, "in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);
+		// dprint(FD_RUIMING, "td_io_getevents: in_flight=%u, ts=%ld%ld\n", td->io_u_in_flight, curTime.tv_sec, curTime.tv_nsec);
 		td->io_u_in_flight -= r;
 		io_u_mark_complete(td, r);
 	} else

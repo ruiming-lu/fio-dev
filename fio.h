@@ -195,6 +195,9 @@ struct zone_split_index {
  * This describes a single thread/process executing a fio job.
  */
 struct thread_data {
+	// int nr_completed;
+	// int nr_prepared;
+	// int nr_delta;
 	struct flist_head opt_list;
 	unsigned long long flags;
 	struct thread_options o;

@@ -240,6 +240,11 @@ static enum fio_q_status fio_libaio_queue(struct thread_data *td,
 
 	fio_ro_check(td, io_u);
 
+	// if (ld->queued) {
+	// 	struct timespec curTime;
+	// 	clock_gettime(CLOCK_REALTIME, &curTime);
+	// 	dprint(FD_RUIMING, "queued=%u, iodepth=%u, ts=%ld%ld\n", ld->queued, td->o.iodepth,curTime.tv_sec, curTime.tv_nsec);	
+	// }
 	if (ld->queued == td->o.iodepth)
 		return FIO_Q_BUSY;
 
@@ -312,6 +317,9 @@ static int fio_libaio_commit(struct thread_data *td)
 
 	if (!ld->queued)
 		return 0;
+	// if (ld->queued > 1) {
+	// 	dprint(FD_RUIMING, "libaio queueLength=%ld\n", ld->queued);
+	// }
 
 	do {
 		long nr = ld->queued;
